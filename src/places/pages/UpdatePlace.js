@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 
 import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from "../../shared/util/validators";
+import { useForm } from "../../shared/hooks/form-hook";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -39,6 +40,23 @@ const UpdatePlace = () => {
 
   const identifiedPlace = DUMMY_PLACES.find(p => p.id === placeId);
 
+  const [formState, inputHandler] = useForm(
+    {
+      title: {
+        value: identifiedPlace.title,
+        isValid: true
+      },
+      description: {
+        value: identifiedPlace.description,
+        isValid: true
+      }
+    }, true)
+
+  const placeUpdateSubmitHandler = event => {
+    event.preventDefault();
+    console.log(formState.inputs);
+  };
+
   if (!identifiedPlace) {
     return (
       <div className="center">
@@ -47,29 +65,31 @@ const UpdatePlace = () => {
     );
   }
 
-  return <form className="place-form">
+  return <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
     <Input
-      id='title'
-      element='input'
-      type='text'
-      label='Title'
+      id="title"
+      element="input"
+      type="text"
+      label="Title"
       validators={[VALIDATOR_REQUIRE()]}
-      errorText='제목을 입력해주세요'
-      onInput={() => { }}
-      value={identifiedPlace.title}
-      valid={true}
+      errorText="제목을 입력해주세요"
+      onInput={inputHandler}
+      initialValue={formState.inputs.title.value}
+      initialValid={formState.inputs.title.isValid}
     />
     <Input
-      id='description'
-      element='textarea'
-      label='Description'
+      id="description"
+      element="textarea"
+      label="Description"
       validators={[VALIDATOR_MINLENGTH(5)]}
-      errorText='5글자 이상의 내용을 입력해주세요'
-      onInput={() => { }}
-      value={identifiedPlace.description}
-      valid={true}
+      errorText="5글자 이상의 내용을 입력해주세요."
+      onInput={inputHandler}
+      initialValue={formState.inputs.description.value}
+      initialValid={formState.inputs.description.isValid}
     />
-    <Button type='submit' disabled={true}>장소 수정</Button>
+    <Button type="submit" disabled={!formState.isValid}>
+      장소 수정
+    </Button>
   </form>
 };
 
